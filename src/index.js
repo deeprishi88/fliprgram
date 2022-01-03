@@ -1,12 +1,14 @@
 const express = require('express');
+const mongoose = require('mongoose');
+const user_route = require('./api/v1/routes/route');
+const db = require('./api/v1/database/databases');
 const app = express();
-var PORT = 3000;
+var PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-app.get('/', (req,res) => {
-    res.send('Hello')
-});
+
+app.use(user_route);
 
 app.listen(PORT, function(err){
     if (err) console.log(err.message);

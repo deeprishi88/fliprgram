@@ -11,13 +11,19 @@
     "type": "git",
     "url": "git+https://github.com/deeprishi88/fliprgram.git"
   },
-  "author": "",
+  "author": "deeprishi88",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/deeprishi88/fliprgram/issues"
   },
   "homepage": "https://github.com/deeprishi88/fliprgram#readme",
   "dependencies": {
-    "express": "^4.17.2"
+    "bcrypt": "^5.0.1",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.2",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.1.4",
+    "nodemailer": "^6.7.2",
+    "validator": "^13.7.0"
   }
 }
