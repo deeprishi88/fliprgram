@@ -14,12 +14,12 @@ route.get("/email_verify/:id", controller.verifyEmailLink);
 
 route
     .route("/")
-    .get(middleware.protect, controller.getUserProfile)
-    .put(middleware.protect, controller.updateCurrentUser);
+    .get(middleware.authorization, controller.getUserProfile)
+    .put(middleware.authorization, controller.updateCurrentUser);
 
-route.get('/users/:id',middleware.protect,controller.finduserbyusername);
+route.get('/users/:id',middleware.authorization,controller.finduserbyusername);
 
-route.post('/search', middleware.protect, controller.search);
+route.post('/search', middleware.authorization, controller.search);
 
 route.post("/forgot_password", controller.forgotPassword);
 

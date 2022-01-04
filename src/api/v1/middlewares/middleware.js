@@ -3,7 +3,7 @@ const UserService = require('../services/service');
 const { tokenValidator } = require('../validators/validator');
 
 
-exports.protect = async (req, res, next) => {
+exports.authorization = async (req, res, next) => {
     const bearer = req.headers.authorization;
 
     if (!bearer || !bearer.startsWith("Bearer ")) {
