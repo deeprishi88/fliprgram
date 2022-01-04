@@ -5,6 +5,7 @@
   "main": "./src/index.js",
   "scripts": {
     "start": "nodemon ./src/index.js",
+    "start_email": "nodemon ./email_verify/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -18,12 +19,14 @@
   },
   "homepage": "https://github.com/deeprishi88/fliprgram#readme",
   "dependencies": {
+    "axios": "^0.24.0",
     "bcrypt": "^5.0.1",
     "dotenv": "^10.0.0",
     "express": "^4.17.2",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.1.4",
     "nodemailer": "^6.7.2",
+    "uuid": "^8.3.2",
     "validator": "^13.7.0"
   }
 }
