@@ -27,13 +27,13 @@ async function deleteOneById(id) {
 
 
 // creates an event to send email
-async function createOne(eventName, currentuser) {
+async function createOne(eventName, associatedUser) {
     const unique_code = await uuid();  // creates a unique code
 
     const document = await Email.create({
         verificationCode: unique_code,
         eventName,
-        currentuser,
+        associatedUser,
     });
     return document;
 }

@@ -61,6 +61,7 @@ exports.createEmailEntryRequest = async (
             data: res.data,
         };
     } catch (e) {
+        console.log(e.response);
         return {
             success: false,
             status: e.response && e.response.status,

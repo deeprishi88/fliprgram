@@ -16,18 +16,15 @@ exports.ping = async(req,res) => {
 }
 
 exports.signup = async (req,res) => {
-    const data = req.body;
-    const db = mongoose.connection;
-    db.on('error',()=>console.log("Error in Connecting to Database"));
-    db.once('open',()=>console.log("Connected to Database"));
-    const if_present = await User.findOne({
-        $or: [{ email: data.email}, {username: data.username}]
-    });
-    console.log(if_present);
-    if(if_present){
-        return res.sendStatus(409).send({ error: "User already present"});
-    }
     try {
+        const data = req.body;
+        const if_present = await User.findOne({
+            $or: [{ email: data.email}, {username: data.username}]
+        });
+        console.log(if_present);
+        if(if_present){
+            return res.sendStatus(409).send({ error: "User already present"});
+        }
         const hash = await bcrypt.hash(data.hash, 10);
 
         const date = new Date();

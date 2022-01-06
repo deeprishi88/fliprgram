@@ -53,7 +53,7 @@ exports.createEmailEntry = async (req, res) => {
             email,
             username,
             doc.verificationCode,
-            doc.id,
+            doc.currentuser,
         );
         if (!success) {
             await EmailService.changeSendStatus(doc.id);
