@@ -73,6 +73,7 @@ async function createVerificationEmailEntry(
     username,
 ) {
     try {
+        //console.log('hdfg');
         let res = await fetchService.createEmailEntryRequest(
             email,
             eventName,

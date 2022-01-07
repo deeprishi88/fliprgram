@@ -8,7 +8,7 @@ const { BASEURL } = require("../../config/config");
     await transporter.sendMail({
         to,
         subject: subject,
-        text,
+        text: text,
     });
     return;
 }

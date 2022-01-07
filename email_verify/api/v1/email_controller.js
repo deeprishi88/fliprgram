@@ -43,17 +43,17 @@ exports.deleteOnebyId = async (req, res) => {
 
 exports.createEmailEntry = async (req, res) => {
     try {
-        const { eventName, email, userId, username} = req.body;
-        if (!IdValidator(userId) || !eventValidator(eventName)) {
+        const data = req.body;
+        if (!IdValidator(data.userId) || !eventValidator(data.eventName)) {
             return res.status(400).json({ message: "invalid entry" });
         }
-        let doc = await EmailService.createOne(eventName, userId);
+        let doc = await EmailService.createOne(data.eventName, data.userId);
         let success = await EmailService.sendEventEmail(
-            eventName,
-            email,
-            username,
+            data.eventName,
+            data.email,
+            data.username,
             doc.verificationCode,
-            doc.currentuser,
+            doc.associatedUser,
         );
         if (!success) {
             await EmailService.changeSendStatus(doc.id);

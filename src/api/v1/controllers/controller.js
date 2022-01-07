@@ -16,7 +16,6 @@ exports.ping = async(req,res) => {
 }
 
 exports.signup = async (req,res) => {
-    try {
         const data = req.body;
         const if_present = await User.findOne({
             $or: [{ email: data.email}, {username: data.username}]
@@ -25,25 +24,26 @@ exports.signup = async (req,res) => {
         if(if_present){
             return res.sendStatus(409).send({ error: "User already present"});
         }
-        const hash = await bcrypt.hash(data.hash, 10);
-
-        const date = new Date();
-        const user = new User({
-            username: data.username,
-            email: data.email,
-            hash: hash,
-            created_at: date,
-            updated_at: date
-        });
-        await user.save();
-        const eventname = "verificationemail"
-        UserServices.createVerificationEmailEntry(
-            user.email,
-            eventname,
-            user.id,
-            user.username,
-        );
-        res.status(201).send("Verification Code sent and user registered");
+        try{
+            const hash = await bcrypt.hash(data.hash, 10);
+            const date = new Date();
+            const user = new User({
+                username: data.username,
+                email: data.email,
+                hash: hash,
+                created_at: date,
+                updated_at: date
+            });
+            await user.save();
+            const eventname = "verificationemail"
+            //console.log(eventname);
+            UserServices.createVerificationEmailEntry(
+                user.email,
+                eventname,
+                user._id,
+                user.username,
+            );
+            res.status(200).send("Verification Code sent and user registered");
     } catch(e) {
         res.sendStatus(400).send(e.message);
     }
@@ -51,7 +51,7 @@ exports.signup = async (req,res) => {
 
 exports.login = async(req,res) =>{
     const data = req.body;
-    if (!data.password) {
+    if (!data.hash) {
         return res.status(400).send({ message: "password is required" });
     }
     if (!data.username) {
@@ -62,15 +62,15 @@ exports.login = async(req,res) =>{
     try {
         const user = await User.findOne({username: data.username});
         if (!user) {
-            res.status(401).send(invalid);
+            res.status(401).send("invalid data");
         }
         console.log(user);
-        const passmatch = bcrypt.compare(data.password,user.password, function(err,result) {});
+        const passmatch = await bcrypt.compare(data.hash,user.hash);
         if(!passmatch){
             res.status(401).send("Invalid Password");
         }
         const token = auth.newToken(user);
-        res.sendStatus(200).send({ token });
+        res.status(200).send(token);
     } catch(e) {
         console.error(e);
         res.status(500).end();
@@ -87,8 +87,10 @@ exports.finduserbyusername = async (req,res) => {
         if(!record){
             res.status(404).send("No User Exists");
         } 
+        //console.log(record);
         return res.status(200).json({
-            ...record._doc
+            username: record.username,
+            email: record.email
         });
     } catch(e) {
         return res.status(500).json({ message: e.message });
