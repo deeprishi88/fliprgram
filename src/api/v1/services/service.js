@@ -116,7 +116,9 @@ async function friendlist(username) {
         const user = await User.findOne({username: username})
         .populate('friends')
         .exec();
-
+        if(!user){
+            throw new error('Invalid User');
+        }
         return {
             success: true,
             message: 'friend list received',
@@ -134,35 +136,20 @@ async function sendrequest(sender, receiver){
     try {
         const ifsender = User.findOne({username: sender}).exec();
         if(!ifsender){
-            return {
-                success: false,
-                message: 'invalid sender username'
-            };
+            throw new error('invalid sender username');
         }
         const ifreceiver = User.findOne({username: receiver}).exec();
         if(!ifreceiver){
-            return {
-                success: false,
-                message: 'invalid receiver username'
-            };
+            throw new error('invalid receiver username');
         }
         if(ifreceiver.blocklist.includes(ifsender.username)){
-            return {
-                success: false,
-                message: 'Receiver have blocked you'
-            };
+            throw new error('receiver have blocked you');
         }
         if(ifsender.friends.includes(ifreceiver.username)){
-            return {
-                success: false,
-                message: 'Receiver already your friend'
-            };
+            throw new error('receiver already your friend');
         }
         if(ifsender.sentrequests.includes(ifreceiver.username)){
-            return {
-                success: false,
-                message: 'Request already sent'
-            };
+            throw new error('request already sent');
         }
         ifsender.sentrequests.addToSet(ifreceiver.username);
         ifreceiver.receiverequests.addToSet(ifsender.username);
@@ -183,29 +170,17 @@ async function acceptrequest(sender, receiver) {
     try {
         const ifsender = User.findOne({username: sender}).exec();
         if(!ifsender){
-            return {
-                success: false,
-                message: 'invalid sender username provided'
-            };
+            throw new error('invalid sender username');
         }
         const ifreceiver = User.findOne({username: receiver}).exec();
         if(!ifreceiver){
-            return {
-                success: false,
-                message: 'invalid receiver username provided'
-            };
+            throw new error('invalid receiver username');
         }
         if(ifsender.friends.includes(ifreceiver.username)){
-            return {
-                success: false,
-                message: 'Sender already a friend of receiver'
-            }
+            throw new error('Receiver already a friend');
         }
         if(!ifreceiver.receiverequests.includes(ifsender.username)){
-            return {
-                success: false,
-                message: 'Request not yet sent to receiver by sender'
-            }
+            throw new error('Request not yet sent to receiver by sender');
         }
         ifsender.sentrequests.pull(ifreceiver.username);
         ifreceiver.receiverequests.pull(ifsender.username);
@@ -228,29 +203,17 @@ async function rejectrequest(sender, receiver) {
     try {
         const ifsender = User.findOne({username: sender}).exec();
         if(!ifsender){
-            return {
-                success: false,
-                message: 'invalid sender username provided'
-            };
+            throw new error('invalid sender username');
         }
         const ifreceiver = User.findOne({username: receiver}).exec();
         if(!ifreceiver){
-            return {
-                success: false,
-                message: 'invalid receiver username provided'
-            };
+            throw new error('invalid receiver username');
         }
         if(ifsender.friends.includes(ifreceiver.username)){
-            return {
-                success: false,
-                message: 'Sender already a friend of receiver'
-            }
+            throw new error('Receiver already a friend');
         }
         if(!ifreceiver.receiverequests.includes(ifsender.username)){
-            return {
-                success: false,
-                message: 'Request not yet sent to receiver by sender'
-            }
+            throw new error('Request not yet sent to receiver by sender');
         }
         ifsender.sentrequests.pull(ifreceiver.username);
         ifreceiver.receiverequests.pull(ifsender.username);
@@ -271,23 +234,14 @@ async function removefriend(currentuser, friend){
     try{
         const ifcurrentuser = User.findOne({username: currentuser}).exec();
         if(!ifcurrentuser){
-            return {
-                success: false,
-                message: 'invalid current username provided'
-            };
+            throw new error('invalid current username');
         }
         const iffriend = User.findOne({username: friend}).exec();
         if(!iffriend){
-            return {
-                success: false,
-                message: 'invalid friend username provided'
-            };
+            throw new error('invalid friend username');
         }
         if(!ifcurrentuser.friends.includes(friend)){
-            return {
-                success: false,
-                message: 'Already not in friends list of user'
-            };
+            throw new error('Already not in friendlist of user');
         }
         ifcurrentuser.friends.pull(friend);
         iffriend.friends.pull(currentuser);
@@ -308,23 +262,14 @@ async function blocked(currentuser,seconduser){
     try {
         const ifcurrentuser = User.findOne({username: currentuser}).exec();
         if(!ifcurrentuser){
-            return {
-                success: false,
-                message: 'invalid current username provided'
-            };
+            throw new error('invalid current username');
         }
         const ifseconduser = User.findOne({username: seconduser}).exec();
         if(!ifseconduser){
-            return {
-                success: false,
-                message: 'invalid second username provided'
-            };
+            throw new error('invalid second username');
         }
         if(ifcurrentuser.blocklist.includes(seconduser)){
-            return {
-                success: false,
-                message: 'Second user already blocked'
-            };
+            throw new error('Seconduser already blocked');
         }
         if(ifcurrentuser.friends.includes(seconduser)){
             ifcurrentuser.friends.pull(seconduser);
