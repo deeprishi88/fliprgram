@@ -111,6 +111,7 @@ async function sendVerificationEmail(email, username, code) {
     }
 }
 
+// provides friends list
 async function friendlist(username) {
     try {
         const user = await User.findOne({username: username})
@@ -132,13 +133,14 @@ async function friendlist(username) {
     }
 }
 
+// sends the request
 async function sendrequest(sender, receiver){
     try {
-        const ifsender = User.findOne({username: sender}).exec();
+        const ifsender = await User.findOne({username: sender}).exec();
         if(!ifsender){
             throw new error('invalid sender username');
         }
-        const ifreceiver = User.findOne({username: receiver}).exec();
+        const ifreceiver = await User.findOne({username: receiver}).exec();
         if(!ifreceiver){
             throw new error('invalid receiver username');
         }
@@ -151,8 +153,8 @@ async function sendrequest(sender, receiver){
         if(ifsender.sentrequests.includes(ifreceiver.username)){
             throw new error('request already sent');
         }
-        ifsender.sentrequests.addToSet(ifreceiver.username);
-        ifreceiver.receiverequests.addToSet(ifsender.username);
+        await ifsender.sentrequests.addToSet(ifreceiver.username);
+        await ifreceiver.receiverequests.addToSet(ifsender.username);
         await Promise.all([ifsender.save(), ifreceiver.save()]);
         return {
             success: true,
@@ -166,13 +168,14 @@ async function sendrequest(sender, receiver){
     }
 }
 
+// accepts the request
 async function acceptrequest(sender, receiver) {
     try {
-        const ifsender = User.findOne({username: sender}).exec();
+        const ifsender = await User.findOne({username: sender}).exec();
         if(!ifsender){
             throw new error('invalid sender username');
         }
-        const ifreceiver = User.findOne({username: receiver}).exec();
+        const ifreceiver = await User.findOne({username: receiver}).exec();
         if(!ifreceiver){
             throw new error('invalid receiver username');
         }
@@ -182,10 +185,10 @@ async function acceptrequest(sender, receiver) {
         if(!ifreceiver.receiverequests.includes(ifsender.username)){
             throw new error('Request not yet sent to receiver by sender');
         }
-        ifsender.sentrequests.pull(ifreceiver.username);
-        ifreceiver.receiverequests.pull(ifsender.username);
-        ifsender.friends.addToSet(ifreceiver.username);
-        ifreceiver.friends.addToSet(ifsender.username);
+        await ifsender.sentrequests.pull(ifreceiver.username);
+        await ifreceiver.receiverequests.pull(ifsender.username);
+        await ifsender.friends.addToSet(ifreceiver.username);
+        await ifreceiver.friends.addToSet(ifsender.username);
         await Promise.all([ifsender.save(), ifreceiver.save()]);
         return {
             success: true,
@@ -199,13 +202,14 @@ async function acceptrequest(sender, receiver) {
     }
 }
 
+// rejects the request
 async function rejectrequest(sender, receiver) {
     try {
-        const ifsender = User.findOne({username: sender}).exec();
+        const ifsender = await User.findOne({username: sender}).exec();
         if(!ifsender){
             throw new error('invalid sender username');
         }
-        const ifreceiver = User.findOne({username: receiver}).exec();
+        const ifreceiver = await User.findOne({username: receiver}).exec();
         if(!ifreceiver){
             throw new error('invalid receiver username');
         }
@@ -215,8 +219,8 @@ async function rejectrequest(sender, receiver) {
         if(!ifreceiver.receiverequests.includes(ifsender.username)){
             throw new error('Request not yet sent to receiver by sender');
         }
-        ifsender.sentrequests.pull(ifreceiver.username);
-        ifreceiver.receiverequests.pull(ifsender.username);
+        await ifsender.sentrequests.pull(ifreceiver.username);
+        await ifreceiver.receiverequests.pull(ifsender.username);
         await Promise.all([ifsender.save(), ifreceiver.save()]);
         return {
             success: true,
@@ -230,21 +234,22 @@ async function rejectrequest(sender, receiver) {
     }
 }
 
+// removes friend from friendlist
 async function removefriend(currentuser, friend){
     try{
-        const ifcurrentuser = User.findOne({username: currentuser}).exec();
+        const ifcurrentuser = await User.findOne({username: currentuser}).exec();
         if(!ifcurrentuser){
             throw new error('invalid current username');
         }
-        const iffriend = User.findOne({username: friend}).exec();
+        const iffriend = await User.findOne({username: friend}).exec();
         if(!iffriend){
             throw new error('invalid friend username');
         }
         if(!ifcurrentuser.friends.includes(friend)){
             throw new error('Already not in friendlist of user');
         }
-        ifcurrentuser.friends.pull(friend);
-        iffriend.friends.pull(currentuser);
+        await ifcurrentuser.friends.pull(friend);
+        await iffriend.friends.pull(currentuser);
         await Promise.all([ifcurrentuser.save(), iffriend.save()]);
         return {
             success: true,
@@ -260,11 +265,11 @@ async function removefriend(currentuser, friend){
 
 async function blocked(currentuser,seconduser){
     try {
-        const ifcurrentuser = User.findOne({username: currentuser}).exec();
+        const ifcurrentuser = await User.findOne({username: currentuser}).exec();
         if(!ifcurrentuser){
             throw new error('invalid current username');
         }
-        const ifseconduser = User.findOne({username: seconduser}).exec();
+        const ifseconduser = await User.findOne({username: seconduser}).exec();
         if(!ifseconduser){
             throw new error('invalid second username');
         }
@@ -272,10 +277,10 @@ async function blocked(currentuser,seconduser){
             throw new error('Seconduser already blocked');
         }
         if(ifcurrentuser.friends.includes(seconduser)){
-            ifcurrentuser.friends.pull(seconduser);
-            ifseconduser.friends.pull(currentuser);
+            await ifcurrentuser.friends.pull(seconduser);
+            await ifseconduser.friends.pull(currentuser);
         }
-        ifcurrentuser.blocklist.addToSet(seconduser);
+        await ifcurrentuser.blocklist.addToSet(seconduser);
         await Promise.all([ifcurrentuser.save(), ifseconduser.save()]);
         return {
             success: true,
