@@ -263,6 +263,7 @@ async function removefriend(currentuser, friend){
     }
 }
 
+// blocks the seconduser for the currentuser
 async function blocked(currentuser,seconduser){
     try {
         const ifcurrentuser = await User.findOne({username: currentuser}).exec();
