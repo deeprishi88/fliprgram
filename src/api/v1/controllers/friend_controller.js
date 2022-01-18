@@ -56,6 +56,7 @@ exports.rejectrequest = async(req,res) => {
     }
 }
 
+// removes friend from friend list of currentuser
 exports.removefriend = async(req,res) => {
     const { currentuser, friend } = req.body;
     try{
@@ -69,6 +70,7 @@ exports.removefriend = async(req,res) => {
     }
 }
 
+// blocks seconduser for the currentuser
 exports.block = async(req,res) => {
     const { currentuser, seconduser } = req.body;
     try{
