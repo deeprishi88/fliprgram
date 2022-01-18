@@ -31,6 +31,12 @@ const User = mongoose.model('User', {
     updated_at : {
         type: Date
     },
+    profile_pic : {
+        type: String
+    },
+    profile_pic_id : {
+        type: String
+    },
     friends : {
         type: [String],
         default: []
