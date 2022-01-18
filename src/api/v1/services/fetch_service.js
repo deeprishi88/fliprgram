@@ -52,7 +52,6 @@ exports.createEmailEntryRequest = async (
                 username,
             },
         };
-        //console.log('gh');
         let res = await axios(config);
         console.log(res);
         return {

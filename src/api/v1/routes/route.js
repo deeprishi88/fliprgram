@@ -19,7 +19,7 @@ route
 
 route.get('/users/:id',middleware.authorization,controller.finduserbyusername);
 
-route.post('/search', middleware.authorization, controller.search);
+route.post('/search', middleware.authorization,controller.search);
 
 route.post("/forgot_password", controller.forgotPassword);
 

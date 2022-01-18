@@ -30,6 +30,22 @@ const User = mongoose.model('User', {
     },
     updated_at : {
         type: Date
+    },
+    friends : {
+        type: [String],
+        default: []
+    },
+    sentrequests : {
+        type: [String],
+        default: []
+    },
+    receiverequests : {
+        type: [String],
+        default: []
+    },
+    blocklist : {
+        type: [String],
+        default: []
     }
 });
 
