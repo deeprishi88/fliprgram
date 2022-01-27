@@ -50,8 +50,20 @@ const User = mongoose.model('User', {
         default: []
     },
     blocklist : {
-        type: [String],
+        type: String,
         default: []
+    },
+    post_id : {
+        type: [mongoose.Schema.Types.ObjectId],
+        default: [],
+    },
+    liked_posts : {
+        type: [mongoose.Schema.Types.ObjectId],
+        deafult: []
+    },
+    comments_made : {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref : 'comment_model'
     }
 });
 
