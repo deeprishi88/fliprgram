@@ -19,7 +19,7 @@ const imageFilter = function(req,file,cb){
 
 const upload = multer({ storage:storage, fileFilter: imageFilter});
 
-route.get('/get_all_posts/:id',middleware.authorization, controller.get_all_posts);
+route.get('/get_all_posts',middleware.authorization, controller.get_all_posts);
 
 route.get('/get_my_posts/:id', middleware.authorization, controller.get_my_posts);
 
@@ -34,7 +34,7 @@ route.post('/tag_users/:id', middleware.authorization, controller.tag_users);
 route.post('/make_comment/:id', middleware.authorization, controller.make_comment);
 route.post('/delete_comment_by_post_owner/:id', middleware.authorization, controller.delete_comment_by_post_owner);
 route.post('/delete_comment_by_comment_creater/:id', middleware.authorization,controller.delete_comment_by_comment_creater);
-//route.get('/get_my_comments/:id',middleware.authorization,controller.get_my_comments);
+
 //route.post('reply_to_comment');
 
 

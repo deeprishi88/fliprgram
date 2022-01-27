@@ -22,7 +22,6 @@ exports.get_all_posts = async(req,res) => {
         }
 
         const posts = await PostService.getFeeds(
-            req.user._id,
             pagenumber,
             pagesize,
         );
@@ -308,4 +307,5 @@ exports.delete_comment_by_comment_creater = async(req,res) => {
         return res.status(500).send('Some error occured');
     }
 }
+
 
