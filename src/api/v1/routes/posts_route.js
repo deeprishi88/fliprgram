@@ -35,7 +35,7 @@ route.post('/make_comment/:id', middleware.authorization, controller.make_commen
 route.post('/delete_comment_by_post_owner/:id', middleware.authorization, controller.delete_comment_by_post_owner);
 route.post('/delete_comment_by_comment_creater/:id', middleware.authorization,controller.delete_comment_by_comment_creater);
 
-//route.post('reply_to_comment');
+route.post('/:postId/comments/:commentId/reply', middleware.authorization,controller.reply_to_comment);
 
 
 module.exports = route;

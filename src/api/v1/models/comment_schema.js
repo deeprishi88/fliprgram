@@ -18,6 +18,10 @@ const comment_model = mongoose.model('comment_model', {
     created_at : {
         type: Date
     },
+    replies : {
+        type : [mongoose.Schema.Types.ObjectId],
+        ref: 'comment_model'
+    }
 });
 
 module.exports = comment_model;

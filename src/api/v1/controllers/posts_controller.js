@@ -22,6 +22,7 @@ exports.get_all_posts = async(req,res) => {
         }
 
         const posts = await PostService.getFeeds(
+            req.user_id,
             pagenumber,
             pagesize,
         );
@@ -31,6 +32,25 @@ exports.get_all_posts = async(req,res) => {
     }
 }
 
+exports.get_my_posts = async(req,res) => {
+    try {
+        const userId = req.params.id;
+        const user = await User.findById(userId);
+        if(!user){
+            return res.status(409).send('Invalid user');
+        }
+        const post_pics = [];
+        const post_pics_id = [];
+        for(let i=0;i<user.post_id.length;i++){
+            const post = await posts_user.findById(user.post_id[i]);
+            await post_pics.addToSet(post.post_image);
+            await post_pics_id.addToSet(post.post_image_id);
+        }
+        return res.status(200).json({message: 'all posts fetched successfully', post_pics : post_pics, post_pics_id : post_pics_id });
+    } catch(e) {
+        return res.status(500).send('Some error occured');
+    }
+}
 
 exports.create_post = async(req,res) => {
     try {
@@ -105,12 +125,12 @@ exports.like_post = async(req,res) => {
         const username = req.body.username;
         const postId = req.body.post_id;
 
-        const currentuser = UserServices.findOneByUsername(username);
+        const currentuser = await UserServices.findOneByUsername(username);
         if(!currentuser){
             return res.status(409).send('Invalid User');
         }
 
-        const post = posts_user.findById(postId);
+        const post = await posts_user.findById(postId);
         if(!post){
             return res.status(409).send('Invalid post id provided');
         }
@@ -133,12 +153,12 @@ exports.unlike_post = async(req,res) => {
         const username = req.body.username;
         const postId = req.body.post_id;
 
-        const currentuser = UserServices.findOneByUsername(username);
+        const currentuser = await UserServices.findOneByUsername(username);
         if(!currentuser){
             return res.status(409).send('Invalid User');
         }
 
-        const post = posts_user.findById(postId);
+        const post = await posts_user.findById(postId);
         if(!post){
             return res.status(409).send('Invalid post id provided');
         }
@@ -165,7 +185,7 @@ exports.tag_users = async(req,res) => {
         const postId = req.body.postId;
         const usernames_to_be_tagged = req.body.usernames;
 
-        const post = posts_user.findById(postId);
+        const post = await posts_user.findById(postId);
         if(!post){
             return res.status(409).send('Invalid post id');
         }
@@ -180,33 +200,13 @@ exports.tag_users = async(req,res) => {
     }
 }
 
-exports.get_my_posts = async(req,res) => {
-    try {
-        const userId = req.params.id;
-        const user = User.findById(userId);
-        if(!user){
-            return res.status(409).send('Invalid user');
-        }
-        const post_pics = [];
-        const post_pics_id = [];
-        for(let i=0;i<user.post_id.length;i++){
-            const post = await posts_user.findById(user.post_id[i]);
-            await post_pics.addToSet(post.post_image);
-            await post_pics_id.addToSet(post.post_image_id);
-        }
-        return res.status(200).json({message: 'all posts fetched successfully', post_pics : post_pics, post_pics_id : post_pics_id });
-    } catch(e) {
-        return res.status(500).send('Some error occured');
-    }
-}
-
 exports.make_comment = async(req,res) => {
     try {
         const userId = req.params.id;
         const postId = req.body.postid;
         const text = req.body.text;
-        const user = User.findById(userId);
-        const post = posts_user.findById(postId);
+        const user = await User.findById(userId);
+        const post = await posts_user.findById(postId);
         if(!post){
             return res.status(409).send('Invalid post');
         }
@@ -235,10 +235,10 @@ exports.make_comment = async(req,res) => {
 exports.delete_comment_by_post_owner = async(req,res) => {
     try {
         const post_owner_id = req.params.id;
-        const post_owner = User.findById(post_owner_id);
+        const post_owner = await User.findById(post_owner_id);
 
         const comment_id = req.body.commentid;
-        const comment = posts_comment.findById(comment_id);
+        const comment = await posts_comment.findById(comment_id);
         if(!comment){
             return res.status(409).send('Invalid comment');
         }
@@ -246,8 +246,8 @@ exports.delete_comment_by_post_owner = async(req,res) => {
         const post_id = comment.post_id;
         const creater_id = comment.creater_id;
 
-        const post = user_posts.findById(post_id);
-        const creater = User.findById(creater_id);
+        const post = await user_posts.findById(post_id);
+        const creater = await User.findById(creater_id);
 
         await posts_comment.findByIdAndDelete(comment_id, function(err,comment){
             if(err){
@@ -274,8 +274,8 @@ exports.delete_comment_by_comment_creater = async(req,res) => {
         const creater_id = req.params.id;
         const comment_id = req.body.commentid;
 
-        const creater = User.findById(creater_id);
-        const comment = posts_comment.findById(comment_id);
+        const creater = await User.findById(creater_id);
+        const comment = await posts_comment.findById(comment_id);
 
         if(!comment){
             return res.status(409).send('Invalid comment');
@@ -285,7 +285,7 @@ exports.delete_comment_by_comment_creater = async(req,res) => {
         }
 
         const post_id = comment.post_id;
-        const post = user_posts.findById(post_id);
+        const post = await user_posts.findById(post_id);
 
         await posts_comment.findByIdAndDelete(comment_id, function(err,comment){
             if(err){
@@ -308,4 +308,35 @@ exports.delete_comment_by_comment_creater = async(req,res) => {
     }
 }
 
+exports.reply_to_comment = async(req,res) => {
+    try{
+        const { postId, commentId } = req.params;
+
+        const post = await posts_user.findById(postId);
+        if(!post.comments.includes(commentId)){
+            return res.status(409).json({message: "Comment with given id not found in that post"});
+        }
+
+        const { text } = req.body;
+
+        const reply = new posts_comment ({
+            text : text,
+            creater_id : req.userId,
+            post_id : postId,
+            created_at : date
+        });
+
+        await reply.save();
+
+        const comment = await posts_comment.findById(commentId);
+
+        comment.replies.unshift(reply._id);
+
+        await comment.save();
+
+        return res.status(200).json({message: "Reply to comment added successfully"});
+    } catch(e) {
+        return res.status(500).send('Some error occured');
+    }
+}
 
