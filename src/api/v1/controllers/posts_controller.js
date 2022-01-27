@@ -318,7 +318,8 @@ exports.reply_to_comment = async(req,res) => {
         }
 
         const { text } = req.body;
-
+        const date = new Date();
+        
         const reply = new posts_comment ({
             text : text,
             creater_id : req.userId,
