@@ -64,7 +64,17 @@ const User = mongoose.model('User', {
     comments_made : {
         type: [mongoose.Schema.Types.ObjectId],
         ref : 'comment_model'
-    }
+    },
+    profileStatus:{
+        type: String,
+        enum: ["public", "private"],
+        default: "public",
+    },
+
+    notification:{
+        type: Boolean,
+        default: false,
+    },
 });
 
 module.exports = User;
